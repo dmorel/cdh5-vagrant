@@ -542,6 +542,9 @@ alternatives --set flume-ng-conf /etc/flume-ng/conf.vagrant
 rm -f /etc/flume-ng/conf.vagrant/flume.conf
 cp /etc/flume-ng/conf.vagrant/flume-conf.properties.template /etc/flume-ng/conf.vagrant/flume.conf
 
+# disable it at startup since it takes 100% CPU; needs config
+chkconfig flume-ng-agent off
+
 ## hue installation and configuration   ##
 # configure and start hue web server
 #-----------------------------------------
