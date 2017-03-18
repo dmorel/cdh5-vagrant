@@ -3,8 +3,8 @@
 #install mysql database for cloudera  BEFORE installing cloudera
 #---------------------------------------------------------------
 # ref http://www.cloudera.com/content/cloudera-content/cloudera-docs/CM4Ent/latest/Cloudera-Manager-Installation-Guide/cmig_install_mysql.html#cmig_topic_5_5
-sudo yum install -y mysql-server
-service mysqld start
+sudo yum install -y mariadb-server mariadb
+service mariadb start
 
 yum install -y mysql-connector-java
 
@@ -73,8 +73,7 @@ mysql -u root -pp@ssw0rd -e "create database hmon DEFAULT CHARACTER SET utf8;"
 mysql -u root -pp@ssw0rd -e "grant all on hmon.* TO 'hmon'@'%' IDENTIFIED BY 'p@ssw0rd';"
 
 # to make sure mysql will start at boot
-/sbin/chkconfig mysqld on
-/sbin/chkconfig --list mysqld
+systemctl enable mariadb
 
 ################## install zookeeper server   ####################
 # install zookeper as standalone server BEFORE installing cloudera
@@ -89,7 +88,7 @@ chown -R zookeeper /var/lib/zookeeper/
 service zookeeper-server init --myid=1
 service zookeeper-server start
 
-chkconfig zookeeper-server on
+systemctl enable zookeeper-server
 
 ################## install cdh components   ####################
 # master will act as namenode, resourcemanager and so on...
@@ -192,8 +191,8 @@ sudo -u hdfs hadoop fs -mkdir /tmp
 sudo -u hdfs hadoop fs -chmod -R 1777 /tmp
 
 # autostart namenode and datanode at boot
-chkconfig hadoop-hdfs-namenode on
-chkconfig hadoop-hdfs-datanode on
+systemctl enable hadoop-hdfs-namenode
+systemctl enable hadoop-hdfs-datanode
 
 ## yarn configuration   ##
 # configure and start yarn
@@ -266,9 +265,9 @@ service hadoop-yarn-nodemanager start
 service hadoop-mapreduce-historyserver start
 
 # autostart resourcemanager, nodemanager and historyserver at boot
-chkconfig hadoop-yarn-resourcemanager on
-chkconfig hadoop-yarn-nodemanager on
-chkconfig hadoop-mapreduce-historyserver on
+systemctl enable hadoop-yarn-resourcemanager
+systemctl enable hadoop-yarn-nodemanager
+systemctl enable hadoop-mapreduce-historyserver
 
 # create home directories for yarn users
 sudo -u hdfs hadoop fs -mkdir  /user/vagrant
@@ -318,8 +317,8 @@ service hbase-thrift start
 #service hbase-rest start
 
 # autostart services
-chkconfig hbase-master on
-chkconfig hbase-thrift on
+systemctl enable hbase-master
+systemctl enable hbase-thrift
 
 ## hive installation and configuration   ##
 # configure and start hive
@@ -417,8 +416,8 @@ service hive-server2 start
 /usr/lib/hive/bin/beeline -u jdbc:hive2://localhost:10000 -n username -p password -d org.apache.hive.jdbc.HiveDriver -e "show tables;"
 
 # autostart services
-chkconfig hive-metastore  on
-chkconfig hive-server2 on
+systemctl enable hive-metastore
+systemctl enable hive-server2
 
 ## mahout installation  ##
 # configure mahout library
@@ -486,7 +485,7 @@ sudo -u oozie /usr/lib/oozie/bin/ooziedb.sh create -run
 mysql -u oozie -pp@ssw0rd -e "USE oozie; SHOW TABLES;"
 
 # enable oozie web console
-cd tmp/
+cd /tmp
 wget -q http://archive.cloudera.com/gplextras/misc/ext-2.2.zip
 unzip ext-2.2.zip -d /var/lib/oozie
 rm -f ext-2.2.zip
@@ -494,7 +493,7 @@ rm -f ext-2.2.zip
 # install oozie shared libs
 sudo -u hdfs hadoop fs -mkdir -p /user/oozie/deployments
 sudo -u hdfs hadoop fs -chown -R oozie:oozie /user/oozie
-sudo oozie-setup sharelib create -fs  hdfs://cdh-master:8020 -locallib /usr/lib/oozie/oozie-sharelib-yarn.tar.gz
+sudo oozie-setup sharelib create -fs  hdfs://cdh-master:8020 -locallib /usr/lib/oozie/oozie-sharelib-yarn/
 
 sed -i 's/export OOZIE_CONFIG=\/etc\/oozie\/conf/export OOZIE_CONFIG=\/etc\/oozie\/conf.vagrant/' /etc/oozie/conf.vagrant/oozie-env.sh
 
@@ -505,7 +504,7 @@ service oozie start
 oozie admin -oozie http://localhost:11000/oozie -status
 
 # autostart at boot
-chkconfig oozie on
+systemctl enable oozie
 
 
 ### hcatalog installation and configuration   ###
@@ -525,7 +524,7 @@ sed -i "/templeton.hcat/{n; s/>.*\(<\/value>\)/>\/usr\/lib\/hive-hcatalog\/bin\/
 service hive-webhcat-server start
 
 # autostart at boot
-chkconfig hive-webhcat-server on
+systemctl enable hive-webhcat-server
 
 ### flume agents installation  ###
 # configure and start flume agents
@@ -543,7 +542,7 @@ rm -f /etc/flume-ng/conf.vagrant/flume.conf
 cp /etc/flume-ng/conf.vagrant/flume-conf.properties.template /etc/flume-ng/conf.vagrant/flume.conf
 
 # disable it at startup since it takes 100% CPU; needs config
-chkconfig flume-ng-agent off
+systemctl disable flume-ng-agent
 
 ## hue installation and configuration   ##
 # configure and start hue web server
@@ -619,14 +618,14 @@ sed -i 's/## host_ports=localhost:2181/host_ports=cdh-master:2181/' /etc/hue/con
 service hue start
 
 # autostart at boot
-chkconfig hue on
+systemctl enable hue
 
 ############# print useful informations ################
 # print a recap of useful informations about the cluster
 #-------------------------------------------------------
 # ref
-
-PUBLIC_IP=$(/sbin/ifconfig eth1 | grep "inet addr" | awk -F: '{print $2}' | awk '{print $1}')
+EXTERNAL_IF=$(netstat -ra | grep default | tail -1 | awk '{print $8}')
+PUBLIC_IP=$(/sbin/ifconfig $EXTERNAL_IF | grep "^\s\+inet\s" | awk '{print $2}')
 echo "-----------------------------------------------------------------------------------------"
 echo ""
 echo "  Welcome to Cloudera Hadoop Distribution 5"

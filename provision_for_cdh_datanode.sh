@@ -75,7 +75,7 @@ sed -i '/dfs.datanode.data.dir/{n; s/>.*\(<\/value>\)/>file:\/\/\/dfs\/dn\1/}' /
 service hadoop-hdfs-datanode start
 
 # autostart the datanode at boot time
-chkconfig hadoop-hdfs-datanode on
+systemctl enable hadoop-hdfs-datanode
 
 ## yarn configuration   ##
 # configure and start yarn
@@ -142,7 +142,7 @@ chown -R yarn:yarn /dfs/yarn/local /dfs/yarn/logs
 service hadoop-yarn-nodemanager start
 
 # autostart nodemanager at boot
-chkconfig hadoop-yarn-nodemanager on
+systemctl enable hadoop-yarn-nodemanager
 
 ##### hbase installation and configuration   ######
 # configure and start hbase as regionserver cluster
@@ -182,7 +182,7 @@ echo '# End of file' >> /etc/security/limits.conf
 service hbase-regionserver start
 
 # autostart services
-chkconfig hbase-regionserver on
+systemctl enable hbase-regionserver
 
 ### flume agents installation  ###
 # configure and start flume agents
@@ -198,3 +198,7 @@ alternatives --set flume-ng-conf /etc/flume-ng/conf.vagrant
 # copy the template file to effective configuration properties file; it must be edited then!
 rm -f /etc/flume-ng/conf.vagrant/flume.conf
 cp /etc/flume-ng/conf.vagrant/flume-conf.properties.template /etc/flume-ng/conf.vagrant/flume.conf
+
+systemctl disable flume-ng-agent
+systemctl stop flume-ng-agent
+

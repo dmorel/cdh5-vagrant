@@ -5,7 +5,7 @@
 VAGRANTFILE_API_VERSION = "2"
 
 # Configuration parameters
-managerRam = 2048                     # Ram in MB for the Cludera Manager Node
+managerRam = 3072                     # Ram in MB for the Cludera Manager Node
 nodeRam = 1024                        # Ram in MB for each DataNode
 nodeCount = 2                         # Number of DataNodes to create
 privateNetworkIp = "10.10.50.5"       # Starting IP range for the private network between nodes
@@ -40,8 +40,8 @@ EOF
 SCRIPT
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "centos65-x86_64-20140116"
-  config.vm.box_url = "https://github.com/2creatives/vagrant-centos/releases/download/v6.4.2/centos64-x86_64-20140116.box"
+  config.vm.box = "centos7"
+  #config.vm.box_url = "https://atlas.hashicorp.com/centos/boxes/7/versions/1702.01/providers/virtualbox.box"
   config.vm.define "cdh-master" do |master|
     master.vm.network :public_network, :bridge => 'eth0'
     master.vm.network :private_network, ip: "#{privateSubnet}.#{privateStartingIp}", :netmask => "255.255.255.0", virtualbox__intnet: "cdhnetwork"
