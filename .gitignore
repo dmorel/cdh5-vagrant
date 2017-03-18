@@ -217,3 +217,4 @@ pip-log.txt
 # VirtualBox Files
 *.vdi
 *virtualbox/
+jdk-*-linux-x64.rpm
