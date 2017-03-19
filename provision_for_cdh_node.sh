@@ -1,6 +1,6 @@
 #!/bin/bash
-################## install oracle jdk1.7   ####################
-yum install -y wget unzip bzip2 tar
+################## install oracle jdk8   ####################
+yum install -y wget unzip bzip2 tar net-tools
 sed -i 's/exclude=kernel/#exclude=kernel/g' /etc/yum.conf
 
 yum update -y
