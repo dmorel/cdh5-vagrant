@@ -40,7 +40,7 @@ EOF
 SCRIPT
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "centos7"
+  config.vm.box = "centos7-01"
   #config.vm.box_url = "https://atlas.hashicorp.com/centos/boxes/7/versions/1702.01/providers/virtualbox.box"
   config.vm.define "cdh-master" do |master|
     master.vm.network :public_network, :bridge => 'eth0'
@@ -55,9 +55,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.customize ["modifyvm", :id, "--memory", "#{managerRam}"]
       file_to_disk = File.realpath( "." ).to_s + "/" + v.name + "_secondary_hdd.vdi"
       if ARGV[0] == "up" && ! File.exist?(file_to_disk)
-        v.customize ['storagectl', :id, '--name', 'SATA', '--portcount', 2, '--hostiocache', 'on']
+        v.customize ['storagectl', :id, '--name', 'SATA Controller', '--portcount', 2, '--hostiocache', 'on']
         v.customize ['createhd', '--filename', file_to_disk, '--format', 'VDI', '--size', "#{secondaryStorage * 1024}"]
-        v.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', file_to_disk]
+        v.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', file_to_disk]
       end
     end
 
@@ -81,9 +81,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         v.customize ["modifyvm", :id, "--memory", "#{nodeRam}"]
         file_to_disk = File.realpath( "." ).to_s + "/" + v.name + "_secondary_hdd.vdi"
         if ARGV[0] == "up" && ! File.exist?(file_to_disk)
-          v.customize ['storagectl', :id, '--name', 'SATA', '--portcount', 2, '--hostiocache', 'on']
+          v.customize ['storagectl', :id, '--name', 'SATA Controller', '--portcount', 2, '--hostiocache', 'on']
           v.customize ['createhd', '--filename', file_to_disk, '--format', 'VDI', '--size', "#{secondaryStorage * 1024}"]
-          v.customize ['storageattach', :id, '--storagectl', 'SATA', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', file_to_disk]
+          v.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', file_to_disk]
         end
       end
       node.vm.provision :shell, :path => "provision_for_mount_disk.sh"
