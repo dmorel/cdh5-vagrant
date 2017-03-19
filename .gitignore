@@ -218,3 +218,4 @@ pip-log.txt
 *.vdi
 *virtualbox/
 jdk-*-linux-x64.rpm
+package.box
