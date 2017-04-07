@@ -1,4 +1,9 @@
 #!/bin/bash
+
+sudo yum install -y avahi
+sudo systemctl enable avahi-daemon
+sudo systemctl start avahi-daemon
+
 ################## install mysql database for cloudera   ####################
 #install mysql database for cloudera  BEFORE installing cloudera
 #---------------------------------------------------------------
@@ -170,6 +175,10 @@ echo '  </property>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
 echo '  <property>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
 echo '    <name>dfs.webhdfs.enabled</name>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
 echo '    <value>true</value>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
+echo '  </property>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
+echo '  <property>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
+echo '    <name>dfs.namenode.rpc-bind-host</name>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
+echo '    <value>0.0.0.0</value>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
 echo '  </property>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
 echo '</configuration>' >> /etc/hadoop/conf.vagrant/hdfs-site.xml
 
